@@ -1,0 +1,88 @@
+# Market Pulse configuration
+# Anything secret (API keys, tokens, passwords) belongs in .env, never here.
+
+market:
+  # Symbols to follow. Leave the list empty to accept every symbol a provider returns.
+  watchlist:
+    - AAPL
+    - MSFT
+    - NVDA
+    - TSLA
+    - JPM
+    - AMZN
+    - GOOGL
+    - KO
+  # How many days ahead an event has to be to still make the brief.
+  lookahead_days: 7
+
+news:
+  lookback_hours: 24
+  max_items: 12
+  # Headlines scoring below this never reach a notifier.
+  min_score: 1.5
+
+scoring:
+  high_priority_keywords:
+    - earnings
+    - guidance
+    - acquisition
+    - merger
+    - bankruptcy
+    - investigation
+    - recall
+    - interest rate
+    - inflation
+    - fed
+    - downgrade
+    - upgrade
+  medium_priority_keywords:
+    - dividend
+    - buyback
+    - analyst
+    - forecast
+    - revenue
+    - layoffs
+    - partnership
+    - launch
+    - lawsuit
+  positive_words:
+    - beats
+    - beat
+    - record
+    - surge
+    - rally
+    - upgrade
+    - raises
+    - growth
+    - profit
+    - approval
+  negative_words:
+    - misses
+    - miss
+    - plunge
+    - slump
+    - downgrade
+    - cuts
+    - loss
+    - probe
+    - investigation
+    - recall
+    - lawsuit
+    - layoffs
+
+schedule:
+  # IANA timezone used for both display and the daily timer.
+  timezone: Asia/Kolkata
+  run_at:
+    - "08:00"
+    - "18:30"
+
+channels:
+  telegram:
+    enabled: true
+  email:
+    enabled: false
+    smtp_host: smtp.gmail.com
+    smtp_port: 587
+    use_tls: true
+    recipients: []

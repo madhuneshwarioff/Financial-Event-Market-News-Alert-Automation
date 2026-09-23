@@ -1,5 +1,14 @@
-# Financial-Event-Market-News-Alert-Automation
-Market Pulse pulls scheduled market events and financial news from public APIs, works out which dates are close enough to matter, ranks the headlines that are actually relevant to a watchlist, and pushes one short brief to email. It ships with a static website that documents the system and a dashboard that renders the output of the most recent run.
+# Market Pulse
+
+**Financial event & market news alert automation**
+
+Market Pulse pulls scheduled market events and financial news from public APIs,
+works out which dates are close enough to matter, ranks the headlines that are
+actually relevant to a watchlist, and pushes one short brief to Telegram or
+email. It ships with a static website that documents the system and a dashboard
+that renders the output of the most recent run.
+
+```
 API  ──►  fetch events & news  ──►  process dates  ──►  rank & dedupe  ──►  notify
                                                                         └──►  dashboard
 ```
@@ -43,7 +52,7 @@ company you hold — and nothing else.
 ## Quick start
 
 ```bash
-git clone https://github.com/<madhuneshwarioff>/market-pulse.git
+git clone https://github.com/<your-username>/market-pulse.git
 cd market-pulse
 pip install -r requirements.txt
 

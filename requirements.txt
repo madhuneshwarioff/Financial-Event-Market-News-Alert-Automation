@@ -1,0 +1,9 @@
+# Runtime dependencies.
+# The package degrades gracefully without these (urllib + a tiny YAML reader
+# take over), but installing them is the supported path.
+requests==2.32.3
+PyYAML==6.0.2
+python-dotenv==1.0.1
+
+# Development / testing
+pytest==8.3.3
