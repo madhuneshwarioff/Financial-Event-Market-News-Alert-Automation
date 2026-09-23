@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Market Pulse · financial event &amp; news alert automation</title>
+<meta name="description" content="A Python automation that pulls market events and financial news from an API, processes the dates, and pushes a ranked daily brief to Telegram or email.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📈</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="topbar__brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#2f8fff" stroke-width="1.6">
+        <path d="M1 10.5 4.5 6l3 2.6L13 2.5"/><path d="M13 2.5H9.4M13 2.5v3.6"/>
+      </svg>
+    </span>
+    Market Pulse
+  </a>
+  <nav class="topbar__nav" aria-label="Main">
+    <a href="index.html" aria-current="page">Overview</a>
+    <a href="#how">How it works</a>
+    <a href="#setup">Setup</a>
+    <a class="btn btn--sm" href="dashboard.html">Open dashboard</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ============================================================ hero -- -->
+  <section class="hero wrap">
+    <div class="hero__copy">
+      <span class="pill"><span class="dot dot--live"></span>automation running · 2 briefs a day</span>
+      <h1>Your watchlist tells you what happened. This tells you what is about&nbsp;to.</h1>
+      <p class="hero__lede">
+        Market Pulse checks the earnings calendar, the economic calendar and the newswire
+        every morning and evening, works out which dates are close enough to matter, ranks
+        the headlines that are actually about your positions, and sends one short brief to
+        Telegram or your inbox. Everything below runs from a single Python command.
+      </p>
+      <div class="row">
+        <a class="btn" href="dashboard.html">Open the dashboard</a>
+        <a class="btn btn--ghost" href="#setup">Run it yourself</a>
+      </div>
+      <dl class="hero__facts">
+        <div><dt>Sources</dt><dd class="num">3 calendars + 2 news feeds</dd></div>
+        <div><dt>Alert window</dt><dd class="num">7 days ahead</dd></div>
+        <div><dt>Channels</dt><dd class="num">Telegram · email</dd></div>
+        <div><dt>Tests</dt><dd class="num">56 passing</dd></div>
+      </dl>
+    </div>
+
+    <!-- the product itself: an actual delivered alert -->
+    <figure class="phone" aria-label="Example Telegram alert produced by the pipeline">
+      <div class="phone__bar">
+        <span class="phone__avatar">MP</span>
+        <span>
+          <strong>Market Pulse bot</strong>
+          <em>bot · online</em>
+        </span>
+      </div>
+      <div class="phone__scroll">
+        <div class="bubble">
+          <div class="bubble__title">Market brief · 08:00 IST</div>
+          <div class="bubble__section">Upcoming events</div>
+          <div class="bubble__line"><span class="tag tag--high">HIGH</span> <b>AAPL</b> · Earnings · today</div>
+          <div class="bubble__sub">Apple Inc. (after the close) · EPS est. 2.34</div>
+          <div class="bubble__line"><span class="tag tag--high">HIGH</span> <b>US</b> · Economic release · tomorrow</div>
+          <div class="bubble__sub">Consumer Price Index (YoY) · est. 2.9% · prev 3.1%</div>
+          <div class="bubble__line"><span class="tag tag--medium">MED</span> <b>JPM</b> · Earnings · Thursday</div>
+          <div class="bubble__sub">JPMorgan Chase &amp; Co. (before the open)</div>
+          <div class="bubble__section">Headlines</div>
+          <div class="bubble__line"><span class="down">▼</span> Regulators open investigation into Tesla driver-assist claims</div>
+          <div class="bubble__sub">Wall Street Journal · 7h ago · score 7.75</div>
+          <div class="bubble__line"><span class="up">▲</span> Apple beats revenue estimates on record services quarter</div>
+          <div class="bubble__sub">Reuters · 1h ago · score 4.5</div>
+          <div class="bubble__stamp">08:00 ✓✓</div>
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <!-- ========================================================= pipeline -- -->
+  <section class="wrap section" id="how">
+    <div class="section__head">
+      <h2>How a brief gets built</h2>
+      <p class="muted">Five stages. Each one is a separate module with its own tests, so a
+      broken news provider never stops the calendar half from delivering.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel__head">
+        <h3>Pipeline</h3>
+        <span class="pill mono">src/pipeline.py</span>
+      </div>
+      <div class="panel__body">
+        <svg class="flow" viewBox="0 0 980 190" role="img"
+             aria-label="Flow diagram: providers feed the fetch stage, which feeds date processing, scoring and filtering, duplicate suppression, then notification and dashboard export.">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0 0 10 5 0 10z" fill="#2f8fff"/>
+            </marker>
+          </defs>
+
+          <g class="flow__src">
+            <rect x="4" y="14" width="150" height="26" rx="4"/>
+            <text x="79" y="31">Finnhub calendars</text>
+            <rect x="4" y="50" width="150" height="26" rx="4"/>
+            <text x="79" y="67">Finnhub company news</text>
+            <rect x="4" y="86" width="150" height="26" rx="4"/>
+            <text x="79" y="103">NewsAPI business feed</text>
+            <rect x="4" y="122" width="150" height="26" rx="4"/>
+            <text x="79" y="139">Bundled sample data</text>
+          </g>
+
+          <path class="flow__link" d="M158 27 H186 V81" marker-end="url(#arrow)"/>
+          <path class="flow__link" d="M158 63 H186" marker-end="url(#arrow)"/>
+          <path class="flow__link" d="M158 99 H186" marker-end="url(#arrow)"/>
+          <path class="flow__link" d="M158 135 H186 V89" marker-end="url(#arrow)"/>
+
+          <g class="flow__stage">
+            <rect x="196" y="56" width="140" height="52" rx="6"/>
+            <text class="flow__n" x="208" y="74">1</text>
+            <text class="flow__t" x="266" y="78">Fetch</text>
+            <text class="flow__d" x="266" y="96">retry · backoff · normalise</text>
+          </g>
+          <path class="flow__link" d="M340 82 H372" marker-end="url(#arrow)"/>
+
+          <g class="flow__stage">
+            <rect x="378" y="56" width="150" height="52" rx="6"/>
+            <text class="flow__n" x="390" y="74">2</text>
+            <text class="flow__t" x="453" y="78">Process dates</text>
+            <text class="flow__d" x="453" y="96">parse · localise · window</text>
+          </g>
+          <path class="flow__link" d="M532 82 H564" marker-end="url(#arrow)"/>
+
+          <g class="flow__stage">
+            <rect x="570" y="56" width="150" height="52" rx="6"/>
+            <text class="flow__n" x="582" y="74">3</text>
+            <text class="flow__t" x="645" y="78">Rank &amp; dedupe</text>
+            <text class="flow__d" x="645" y="96">score · sentiment · history</text>
+          </g>
+          <path class="flow__link" d="M724 72 H756 V36" marker-end="url(#arrow)"/>
+          <path class="flow__link" d="M724 92 H756 V146" marker-end="url(#arrow)"/>
+
+          <g class="flow__stage flow__stage--out">
+            <rect x="762" y="10" width="200" height="52" rx="6"/>
+            <text class="flow__n" x="774" y="28">4</text>
+            <text class="flow__t" x="862" y="32">Notify</text>
+            <text class="flow__d" x="862" y="50">Telegram · email · console</text>
+          </g>
+
+          <g class="flow__stage flow__stage--out">
+            <rect x="762" y="120" width="200" height="52" rx="6"/>
+            <text class="flow__n" x="774" y="138">5</text>
+            <text class="flow__t" x="862" y="142">Export snapshot</text>
+            <text class="flow__d" x="862" y="160">dashboard.json → this site</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="stage-grid">
+      <article class="panel stage">
+        <div class="panel__body">
+          <h3>Fetch</h3>
+          <p>Three Finnhub calendar endpoints and two news feeds are pulled in parallel with
+          exponential backoff. HTTP 429 counts as retryable, which matters on a free tier
+          capped at sixty calls a minute. Every provider row is converted into the same two
+          dataclasses, so adding a fourth source touches one file.</p>
+          <code class="chip">src/fetchers/</code>
+        </div>
+      </article>
+
+      <article class="panel stage">
+        <div class="panel__body">
+          <h3>Process dates</h3>
+          <p>Providers send ISO strings, unix timestamps and day-first dates in the same
+          response. They are all parsed into real dates, moved into your timezone, labelled
+          with a <span class="mono">days_until</span> count, and dropped if they fall outside
+          the alert window. Events then sort soonest first, highest impact first within a day.</p>
+          <code class="chip">src/processing/date_processor.py</code>
+        </div>
+      </article>
+
+      <article class="panel stage">
+        <div class="panel__body">
+          <h3>Rank and dedupe</h3>
+          <p>A headline earns points for hitting your watchlist, for keyword class, and for
+          being fresh. Anything under the threshold is dropped, syndicated copies collapse
+          onto one normalised signature, and a SQLite table of fingerprints makes sure the
+          same story is never sent to you twice.</p>
+          <code class="chip">src/processing/filters.py</code>
+        </div>
+      </article>
+
+      <article class="panel stage">
+        <div class="panel__body">
+          <h3>Notify and export</h3>
+          <p>Telegram gets an HTML message trimmed to the 4096-character limit; email gets a
+          multipart message so text-only clients still read it. Channels return a result
+          object rather than raising, so one dead channel never blocks the other. The same
+          digest is written to JSON for the dashboard.</p>
+          <code class="chip">src/notifiers/</code>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ========================================================== scoring -- -->
+  <section class="wrap section">
+    <div class="section__head">
+      <h2>Why one headline makes the cut and another does not</h2>
+      <p class="muted">The score is deliberately a transparent sum rather than a model, so
+      any alert can be explained after the fact. Weights live in <span class="mono">config.yaml</span>.</p>
+    </div>
+
+    <div class="score-layout">
+      <div class="panel">
+        <div class="panel__head"><h3>Scoring rules</h3></div>
+        <table class="table">
+          <thead>
+            <tr><th>Signal</th><th>Weight</th><th>Applies when</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Watchlist symbol</td><td class="num">+2.0</td><td>the story is tagged with a symbol you follow (capped at two)</td></tr>
+            <tr><td>High-priority keyword</td><td class="num">+2.5</td><td>earnings, acquisition, investigation, interest rate, downgrade…</td></tr>
+            <tr><td>Medium-priority keyword</td><td class="num">+1.0</td><td>dividend, buyback, analyst, layoffs, lawsuit…</td></tr>
+            <tr><td>Published under 3h ago</td><td class="num">+1.5</td><td>halved between three and eight hours old</td></tr>
+            <tr><td>Below <span class="mono">min_score</span></td><td class="num down">drop</td><td>never reaches a notifier at all</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel worked">
+        <div class="panel__head"><h3>A worked example</h3></div>
+        <div class="panel__body">
+          <p class="worked__head">“Regulators open investigation into Tesla driver-assist claims”</p>
+          <ul class="worked__list">
+            <li><span>TSLA on the watchlist</span><b class="num">+2.00</b></li>
+            <li><span>keyword <i>investigation</i></span><b class="num">+2.50</b></li>
+            <li><span>keyword <i>recall</i> in the summary</span><b class="num">+2.50</b></li>
+            <li><span>published 7 hours ago</span><b class="num">+0.75</b></li>
+          </ul>
+          <div class="worked__total">
+            <span>Final score</span><b class="num">7.75</b>
+          </div>
+          <p class="small muted">Tagged <b class="down">negative</b> because two lexicon words
+          (<i>investigation</i>, <i>probe</i>) matched and none positive. Marked high
+          importance, so it leads the brief.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ stack -- -->
+  <section class="wrap section">
+    <div class="section__head">
+      <h2>What it is built from</h2>
+      <p class="muted">Standard library wherever the standard library is enough. The three
+      third-party packages are optional — the project falls back to
+      <span class="mono">urllib</span> and a small built-in config reader if they are missing.</p>
+    </div>
+
+    <div class="stack-grid">
+      <div class="panel chip-card"><b>Python 3.10+</b><span>dataclasses, enums, type hints throughout</span></div>
+      <div class="panel chip-card"><b>requests · urllib</b><span>HTTP with retry and exponential backoff</span></div>
+      <div class="panel chip-card"><b>SQLite</b><span>sent-item fingerprints and the run log</span></div>
+      <div class="panel chip-card"><b>Telegram Bot API</b><span>sendMessage with HTML parse mode</span></div>
+      <div class="panel chip-card"><b>smtplib · email</b><span>multipart HTML and plain-text mail</span></div>
+      <div class="panel chip-card"><b>pytest</b><span>56 unit and integration tests, no network</span></div>
+      <div class="panel chip-card"><b>GitHub Actions</b><span>lint and test on every push</span></div>
+      <div class="panel chip-card"><b>Vanilla JS · SVG</b><span>this site and the dashboard, no build step</span></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ setup -- -->
+  <section class="wrap section" id="setup">
+    <div class="section__head">
+      <h2>Run it in four commands</h2>
+      <p class="muted">The demo flag uses bundled data, so the whole pipeline works before
+      you have signed up for anything.</p>
+    </div>
+
+    <div class="setup-grid">
+      <div class="panel">
+        <div class="panel__head"><h3>Install and try it</h3></div>
+        <div class="panel__body panel__body--flush">
+<pre class="code"><span class="c"># 1 · clone and install</span>
+git clone https://github.com/&lt;your-username&gt;/market-pulse.git
+cd market-pulse
+pip install -r requirements.txt
+
+<span class="c"># 2 · run the whole pipeline on bundled data</span>
+python run.py --demo --dry-run
+
+<span class="c"># 3 · add your keys, then send for real</span>
+cp .env.example .env
+python run.py --test-channels
+python run.py
+
+<span class="c"># 4 · keep it running on a timer</span>
+python run.py --schedule</pre>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__head"><h3>Where things live</h3></div>
+        <div class="panel__body panel__body--flush">
+<pre class="code">market-pulse/
+├── run.py              <span class="c">CLI entry point</span>
+├── config.yaml         <span class="c">watchlist, weights, schedule</span>
+├── .env                <span class="c">keys and tokens (git-ignored)</span>
+├── src/
+│   ├── fetchers/       <span class="c">calendars + news + sample data</span>
+│   ├── processing/     <span class="c">dates, scoring, models</span>
+│   ├── notifiers/      <span class="c">telegram, email, formatting</span>
+│   ├── storage/        <span class="c">sqlite history</span>
+│   ├── pipeline.py     <span class="c">the five stages, wired up</span>
+│   └── scheduler.py    <span class="c">daily timer loop</span>
+├── tests/              <span class="c">pytest suite</span>
+└── website/            <span class="c">this page + the dashboard</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel note">
+      <div class="panel__body">
+        <h3>Keys you need, and what each unlocks</h3>
+        <ul class="note__list">
+          <li><b>Finnhub</b> — free tier, no card. Earnings, IPO and economic calendars plus company news. This is the only key the project really needs.</li>
+          <li><b>NewsAPI</b> — optional second feed for broader business coverage.</li>
+          <li><b>Telegram bot token and chat id</b> — from <span class="mono">@BotFather</span> and the <span class="mono">getUpdates</span> endpoint. Two minutes, no approval step.</li>
+          <li><b>SMTP credentials</b> — optional. Gmail needs a 16-character app password; the account password is rejected on two-factor accounts.</li>
+        </ul>
+        <p class="small muted">Without any keys the pipeline still runs end to end on the
+        bundled sample data, which is how the test suite and CI exercise it.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <span>Market Pulse · financial event &amp; news alert automation</span>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="#how">How it works</a>
+    <a href="#setup">Setup</a>
+    <span class="hide-sm">MIT licensed · built as a graduate coursework project</span>
+  </div>
+</footer>
+
+<script src="js/site.js"></script>
+</body>
+</html>

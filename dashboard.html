@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard · Market Pulse</title>
+<meta name="description" content="Live view of the latest Market Pulse run: upcoming market events, ranked headlines, delivery history and pipeline health.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📈</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="app">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <button class="icon-btn" id="railToggle" type="button" aria-expanded="false" aria-controls="rail">
+    <span class="sr-only">Show watchlist panel</span>
+    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M2 4h13M2 8.5h13M2 13h13"/>
+    </svg>
+  </button>
+
+  <a class="topbar__brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#2f8fff" stroke-width="1.6">
+        <path d="M1 10.5 4.5 6l3 2.6L13 2.5"/><path d="M13 2.5H9.4M13 2.5v3.6"/>
+      </svg>
+    </span>
+    Market Pulse
+  </a>
+
+  <span class="pill hide-sm" id="runPill"><span class="dot dot--warn"></span>loading snapshot…</span>
+
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <circle cx="6" cy="6" r="4.4"/><path d="M9.4 9.4 13 13"/>
+    </svg>
+    <input id="filter" type="search" placeholder="Filter by symbol, company or headline" aria-label="Filter events and headlines">
+  </div>
+
+  <nav class="topbar__nav" aria-label="Main">
+    <a href="index.html">Overview</a>
+    <a href="dashboard.html" aria-current="page">Dashboard</a>
+    <span class="pill hide-sm"><span class="mono" data-clock>--:--:--</span></span>
+  </nav>
+</header>
+
+<div class="shell">
+
+  <!-- ============================================================ rail -- -->
+  <aside class="rail" id="rail" aria-label="Watchlist and configuration">
+    <section class="rail__block">
+      <h2 class="rail__title">Watchlist</h2>
+      <ul class="watchlist" id="watchlist">
+        <li class="watchlist__empty">loading…</li>
+      </ul>
+    </section>
+
+    <section class="rail__block">
+      <h2 class="rail__title">Next out the door</h2>
+      <div class="next" id="nextEvent"><span class="muted small">loading…</span></div>
+    </section>
+
+    <section class="rail__block">
+      <h2 class="rail__title">Pipeline settings</h2>
+      <dl class="settings" id="settings"></dl>
+    </section>
+  </aside>
+
+  <!-- ============================================================ main -- -->
+  <main class="main" id="main">
+
+    <div class="kpis" id="kpis"></div>
+
+    <section class="grid">
+
+      <!-- index charts, mirroring the layout of a trading terminal -->
+      <article class="panel span-8" id="indexPanel">
+        <div class="panel__head">
+          <h2>Index context</h2>
+          <span class="pill mono">48 intervals</span>
+        </div>
+        <div class="panel__body" id="indexCharts"></div>
+      </article>
+
+      <article class="panel span-4">
+        <div class="panel__head"><h2>Headline sentiment</h2></div>
+        <div class="panel__body" id="sentiment"></div>
+      </article>
+
+      <article class="panel span-8">
+        <div class="panel__head">
+          <h2>Upcoming events</h2>
+          <span class="pill" id="eventCount">—</span>
+        </div>
+        <div class="panel__body panel__body--flush">
+          <div class="table-scroll">
+            <table class="grid-table" id="eventsTable">
+              <thead>
+                <tr>
+                  <th>Symbol</th><th>Event</th><th>Company</th>
+                  <th>When</th><th class="ta-r">Estimate</th><th>Priority</th>
+                </tr>
+              </thead>
+              <tbody><tr><td colspan="6" class="empty">loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel span-4">
+        <div class="panel__head"><h2>Alert window</h2></div>
+        <div class="panel__body" id="windowStrip"></div>
+      </article>
+
+      <article class="panel span-7">
+        <div class="panel__head">
+          <h2>Ranked headlines</h2>
+          <span class="pill" id="newsCount">—</span>
+        </div>
+        <div class="panel__body panel__body--flush">
+          <ul class="feed" id="newsFeed"><li class="empty">loading…</li></ul>
+        </div>
+      </article>
+
+      <article class="panel span-5">
+        <div class="panel__head"><h2>Event mix</h2></div>
+        <div class="panel__body" id="eventMix"></div>
+      </article>
+
+      <article class="panel span-5">
+        <div class="panel__head"><h2>Where headlines came from</h2></div>
+        <div class="panel__body" id="sources"></div>
+      </article>
+
+      <article class="panel span-12">
+        <div class="panel__head">
+          <h2>Delivery history</h2>
+          <span class="pill mono">sqlite · runs table</span>
+        </div>
+        <div class="panel__body panel__body--flush">
+          <div class="table-scroll">
+            <table class="grid-table" id="runsTable">
+              <thead>
+                <tr>
+                  <th>Run</th><th>Started</th><th>Mode</th><th class="ta-r">Events</th>
+                  <th class="ta-r">Headlines</th><th class="ta-r">Alerts</th>
+                  <th>Channels</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody><tr><td colspan="8" class="empty">loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <p class="stamp" id="stamp"></p>
+  </main>
+</div>
+
+<script src="js/charts.js"></script>
+<script src="js/site.js"></script>
+<script src="data/dashboard.fallback.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
